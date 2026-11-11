@@ -21,3 +21,6 @@ build
 
 # Ignore environment variable files
 .env
+
+# Ignore bin directory
+app/bin
