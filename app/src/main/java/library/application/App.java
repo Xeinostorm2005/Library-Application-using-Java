@@ -47,7 +47,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Library Application");
-        primaryStage.show();
+        StageNavigator navigator = new StageNavigator(primaryStage);
+        primaryStage.setTitle("Library Management Application");
+
+        navigator.switchView("/fxml/main.fxml");
     }
 }
