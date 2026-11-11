@@ -7,6 +7,7 @@ A robust desktop-based library management application built with Java 25 and Jav
 **Author:** Xeinostorm05
 **Degree:** Second-year student - M.S in Computer Science and Science in Engineering (5 years)
 **Start Date:** 2026-11-10
+**Status:** NOT COMPLETED
 
 ---
 ## Setup
@@ -43,3 +44,78 @@ python ./setup/db.py
 ---
 ## ER - Diagram
 ![ER-Diagram](/docs/er-diagram.svg)
+
+## Class Diagrams
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#1e293b',
+      'primaryTextColor': '#ffffff',
+      'primaryBorderColor': '#38bdf8',
+      'lineColor': '#00f0ff',
+      'tertiaryColor': '#0f172a',
+      'edgeLabelBackground': '#0f172a',
+      'nodeBorder': '#38bdf8'
+    }
+  }
+}%%
+classDiagram
+
+  class ManageUser {}
+
+  class UserController {
+    + addUser(User user) User
+    + updateUser(User user) User
+    + deleteUser(User user) User
+    + getUserById(String id) User
+    + getUserByEmail(String email) User
+  }
+
+  class UserValidation {
+    + validateEmail() throws exception
+    + validateRole() throws exception
+    + validateUUID() throws exception
+  }
+
+  class UserRepository {
+    + addUser(User user) User
+    + updateUser(User user) User
+    + deleteUser(User user) User
+    + getUserById(String id) User
+    + getUserByEmail(String email) User
+    - mapUser(ResultSet sr) User  
+  }
+
+  ManageUser --|> UserController : Sends Request
+  UserController --|> UserValidation
+  UserValidation --> UserController : invalid
+  UserValidation --|> UserRepository : valid
+
+  class ManageBook {}
+
+  class BookController {
+    + addBook(Book book) Book
+    + updateBook(Book book) Book
+    + deleteBook(Book book) Book
+    + getBookById(String id) Book
+  }
+
+  class BookValidation {
+    + validatePublication() throws exception
+  }
+
+  class BookRepository {
+    + addBook(Book book) Book
+    + updateBook(Book book) Book
+    + deleteBook(Book book) Book
+    + getBookById(String id) Book
+    - mapBook(ResultSet sr) Book  
+  }
+
+  ManageBook --|> BookController : Sends Request
+  BookController --|> BookValidation
+  BookValidation --> BookController : invalid
+  BookValidation --|> BookRepository : valid
+```
