@@ -1,15 +1,17 @@
 CREATE TABLE IF NOT EXISTS user (
-  userId UUID PRIMARY KEY,
+  userId VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   firstName VARCHAR(50) NOT NULL,
   lastName VARCHAR(50) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  role ENUM('admin', 'user') DEFAULT 'user',
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS category (
-  categoryId UUID PRIMARY KEY,
+  categoryId VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   name VARCHAR(100) NOT NULL,
   description TEXT,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -17,7 +19,7 @@ CREATE TABLE IF NOT EXISTS category (
 );
 
 CREATE TABLE IF NOT EXISTS author (
-  authorId UUID PRIMARY KEY,
+  authorId VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   firstName VARCHAR(50) NOT NULL,
   lastName VARCHAR(50) NOT NULL,
   bio TEXT,
@@ -26,7 +28,7 @@ CREATE TABLE IF NOT EXISTS author (
 );
 
 CREATE TABLE IF NOT EXISTS book (
-  bookId UUID PRIMARY KEY,
+  bookId VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   title VARCHAR(200) NOT NULL,
   isbn VARCHAR(20) UNIQUE NOT NULL,
   totalCopies INT NOT NULL DEFAULT 0,
@@ -38,23 +40,23 @@ CREATE TABLE IF NOT EXISTS book (
 );
 
 CREATE TABLE IF NOT EXISTS book_author(
-  bookId UUID,
-  authorId UUID,
+  bookId VARCHAR(36),
+  authorId VARCHAR(36),
   PRIMARY KEY (bookId, authorId),
   FOREIGN KEY (bookId) REFERENCES book(bookId) ON DELETE CASCADE,
   FOREIGN KEY (authorId) REFERENCES author(authorId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS book_category(
-  bookId UUID,
-  categoryId UUID,
+  bookId VARCHAR(36),
+  categoryId VARCHAR(36),
   PRIMARY KEY (bookId, categoryId),
   FOREIGN KEY (bookId) REFERENCES book(bookId) ON DELETE CASCADE,
   FOREIGN KEY (categoryId) REFERENCES category(categoryId) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS loan (
-  loanId UUID PRIMARY KEY,
+  loanId VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
   userId UUID,
   bookId UUID,
   loanDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -68,8 +70,7 @@ CREATE TABLE IF NOT EXISTS loan (
 );
 
 CREATE TABLE IF NOT EXISTS fines (
-  fineId UUID PRIMARY KEY,
-  loanId UUID,
+  loanId VARCHAR(36) PRIMARY KEY,
   pricePerWeek DECIMAL(10, 2) NOT NULL,
   totalPrice DECIMAL(10, 2) NOT NULL,
   isPaid BOOLEAN DEFAULT FALSE,
@@ -78,3 +79,9 @@ CREATE TABLE IF NOT EXISTS fines (
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (loanId) REFERENCES loan(loanId) ON DELETE CASCADE
 );
+
+INSERT INTO user (userId, firstName, lastName, email, password, status, role) VALUES
+(UUID(), 'John', 'Doe', 'john.doe@example.com', 'password', 'active', 'user');
+
+INSERT INTO user (userId, firstName, lastName, email, password, status, role) VALUES
+(UUID(), 'Harry', 'Potter', 'harry.potter@example.com', 'password', 'active', 'admin');

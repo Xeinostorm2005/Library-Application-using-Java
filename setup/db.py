@@ -9,6 +9,7 @@ def create_connection():
         connection = connect(
             host=os.environ.get("DB_HOST"),
             user=os.environ.get("DB_USER"),
+            port=os.environ.get("DB_PORT") or 3306,
             password=os.environ.get("DB_PASSWORD"),
             database=os.environ.get("DB_NAME")
         )
