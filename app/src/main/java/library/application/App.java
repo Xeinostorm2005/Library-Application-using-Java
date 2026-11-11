@@ -1,58 +1,25 @@
 package library.application;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import library.application.database.Client;
+import library.application.database.Config;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
-public class App {
+/**
+ * App
+ */
+public class App extends Application {
     private static Client dbClient;
 
     /**
-     * Static block to initialize the database client using environment variables.
-     * This block will execute when the class is loaded, ensuring that the database client is ready for use throughout the application.
-     * It fetches the database URL, user, and password from environment variables and establishes a connection to the database.
-     * If any of the required environment variables are missing, it throws a RuntimeException to prevent the application from running without a valid database connection.
-     */
-    static {
-        Dotenv dotenv = Dotenv.configure().directory("../").load();
-
-        String user = dotenv.get("DATABASE_USER");
-        if (user == null || user.isEmpty()) {
-            throw new RuntimeException("DATABASE_USER environment variable is not set.");
-        }
-        
-        String host = dotenv.get("DATABASE_HOST");
-        if (host == null || host.isEmpty()) {
-            throw new RuntimeException("DATABASE_HOST environment variable is not set.");
-        }
-
-
-        String password = dotenv.get("DATABASE_PASSWORD");
-        if (password == null || password.isEmpty()) {
-            throw new RuntimeException("DATABASE_PASSWORD environment variable is not set.");
-        }
-        
-        String port = dotenv.get("DATABASE_PORT");
-        if (port == null || port.isEmpty()) {
-            port = "3306";
-        }
-
-        String dbName = dotenv.get("DATABASE_NAME");
-        if (dbName == null || dbName.isEmpty()) {
-            throw new RuntimeException("DATABASE_NAME environment variable is not set.");
-        }
-
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + dbName;
-
-        dbClient = new Client(url, user, password);
-        dbClient.connect();
-    }
-
-    /**
-     * Returns the database client instance for use in the application.
-     * This method provides access to the database client that was initialized in the static block.
+     * Gets the database client instance.
+     * @throws IllegalStateException if the database client has not been initialized yet.
      * @return The database client instance.
      */
     public static Client getDbClient() {
+        if (dbClient == null) {
+            throw new IllegalStateException("Database client has not been initialized yet.");
+        }
         return dbClient;
     }
 
@@ -62,7 +29,25 @@ public class App {
      * @param args Command-line arguments.
      */
     public static void main(String[] args) {
+        // Initialize the database client
+        try {
+            System.out.println("Initializing the database client...");
+            dbClient = Config.createClient();
+            System.out.println("Database client initialized successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to initialize the database client: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
         // Your application logic here
         System.out.println("Application started.");
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("Library Application");
+        primaryStage.show();
     }
 }
