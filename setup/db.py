@@ -7,11 +7,12 @@ import os
 def create_connection():
     try:
         connection = connect(
-            host=os.environ.get("DB_HOST"),
-            user=os.environ.get("DB_USER"),
-            port=os.environ.get("DB_PORT") or 3306,
-            password=os.environ.get("DB_PASSWORD"),
-            database=os.environ.get("DB_NAME")
+            host=os.environ.get("DATABASE_HOST"),
+            user=os.environ.get("DATABASE_USER"),
+            port=os.environ.get("DATABASE_PORT") or 3306,
+            password=os.environ.get("DATABASE_PASSWORD"),
+            database=os.environ.get("DATABASE_NAME"),
+            use_pure=True
         )
         return connection
     except Error as e:
@@ -24,9 +25,9 @@ def execute_sql_file(connection, file_path):
         sql_script = Path(file_path).read_text(encoding="utf-8")
 
         with connection.cursor() as cursor:
-            for result in cursor.execute(sql_script, multi=True):
-                if result.with_rows:
-                    print(result.fetchall())
+            cursor.execute(sql_script)
+            while cursor.nextset():
+                pass
 
             connection.commit()
             print("SQL setup script executed successfully!")
@@ -38,13 +39,13 @@ def execute_sql_file(connection, file_path):
 
 
 def main():
-    load_dotenv(dotenv_path=Path('../.env'))
+    load_dotenv(dotenv_path=Path('./.env'))
 
     connection = create_connection()
 
     if connection:
         try:
-            schema_path = Path("schema.sql")
+            schema_path = Path("./setup/schema.sql")
             execute_sql_file(connection, schema_path)
         finally:
             connection.close()
